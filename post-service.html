@@ -1,0 +1,110 @@
+
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+<link rel="import" href="components/polymer/polymer.html">
+<link rel="import" href="components/core-ajax/core-ajax.html">
+ 
+<polymer-element name="post-service" attributes="posts">
+  <template>
+    <style>
+    :host {
+      display: none;
+    }
+    </style>
+    <core-ajax id="ajax" auto url="mmsportservice.com/api/get_recent_posts/" on-core-response="{{postsLoaded}}" handleAs="json">
+    </core-ajax>
+  </template>
+  <script>
+  Polymer('post-service', {
+    created: function() {
+      this.posts = [];
+    },
+    postsLoaded: function() {
+      // Make a copy of the loaded data
+      var data = this.$.ajax.response.posts,
+        posts = [],
+        el = document.createElement("div");
+      // build custom object
+      for (var i = 0; i < data.length; i++) {
+        //escape title
+        el.innerHTML = data[i].title;
+        var title = el.innerHTML;
+        //escape content
+        el.innerHTML = data[i].excerpt;
+        var excerpt = el.innerHTML;
+ 
+        posts.push({
+          url: data[i].url,
+          title: title,
+          excerpt: excerpt.replace('&nbsp;', ' ').replace('<p>', '').replace('</p>', ''),
+          modified: parseDate(data[i].modified),
+          name : data[i].author.name
+        });
+      };
+      this.posts = posts;
+      document.querySelector('.loading').remove();
+    }
+  });
+ 
+  function parseDate(date) {
+    var d = new Date(date);
+    var months = ["January", "February", "March",
+      "April", "May", "June", "July", "August", "September",
+      "October", "November", "December"
+    ];
+    return d.getDate()+" - "+months[d.getMonth()]+" - "+d.getFullYear();
+  }
+  </script>
+</polymer-element>
